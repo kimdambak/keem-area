@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>10초 클릭 챌린지</title>
+  <style>
+    body {
+      background: #1a1a2e;
+      color: white;
+      font-family: sans-serif;
+      text-align: center;
+      padding: 60px 20px;
+    }
+    h1 { color: #e94560; }
+    #time, #score { font-size: 28px; margin: 10px; }
+    #btn {
+      font-size: 32px;
+      padding: 30px 50px;
+      border: none;
+      border-radius: 20px;
+      background: #e94560;
+      color: white;
+      cursor: pointer;
+      margin-top: 20px;
+    }
+    #btn:active { transform: scale(0.95); }
+    #msg { margin-top: 24px; font-size: 20px; }
+  </style>
+</head>
+<body>
+  <h1>10초 클릭 챌린지</h1>
+  <p>버튼을 누르면 시작! 10초 동안 최대한 많이 클릭하세요.</p>
+  <div id="time">남은 시간: 10초</div>
+  <div id="score">점수: 0</div>
+  <button id="btn">시작!</button>
+  <div id="msg"></div>
+
+  <script>
+    var score = 0;
+    var timeLeft = 10;
+    var playing = false;
+    var timer = null;
+    var best = 0;
+
+    var btn = document.getElementById("btn");
+    var timeEl = document.getElementById("time");
+    var scoreEl = document.getElementById("score");
+    var msg = document.getElementById("msg");
+
+    try { best = Number(localStorage.getItem("best")) || 0; } catch (e) {}
+    if (best > 0) { msg.textContent = "최고 기록: " + best + "점"; }
+
+    btn.addEventListener("click", function () {
+      if (!playing) {
+        startGame();
+      } else {
+        score = score + 1;
+        scoreEl.textContent = "점수: " + score;
+      }
+    });
+
+    function startGame() {
+      playing = true;
+      score = 0;
+      timeLeft = 10;
+      btn.textContent = "클릭!";
+      scoreEl.textContent = "점수: 0";
+      timeEl.textContent = "남은 시간: 10초";
+      msg.textContent = "";
+      timer = setInterval(tick, 1000);
+    }
+
+    function tick() {
+      timeLeft = timeLeft - 1;
+      timeEl.textContent = "남은 시간: " + timeLeft + "초";
+      if (timeLeft <= 0) { endGame(); }
+    }
+
+    function endGame() {
+      clearInterval(timer);
+      playing = false;
+      btn.textContent = "다시 하기";
+      var text = "끝! 내 점수는 " + score + "점";
+      if (score > best) {
+        best = score;
+        text = text + " (새 최고 기록!)";
+        try { localStorage.setItem("best", best); } catch (e) {}
+      }
+      msg.textContent = text;
+    }
+  </script>
+</body>
+</html>
